@@ -28,7 +28,11 @@ static void close_graph(void) {
         printf("    %d [xlabel=\"T: %d\"];\n", getpid(), thread_nr);
     }
     if(depth == 0) {
-        printf("    label=\"Total threads: %d\\nTotal processes: %d\";\n", shared_data->total_threads, shared_data->total_processes);
+        if(shared_data->total_threads > 0) {
+            printf("    label=\"Total threads: %d\\nTotal processes: %d\";\n", shared_data->total_threads, shared_data->total_processes);
+        } else {
+            printf("    label=\"Total processes: %d\";\n", shared_data->total_processes);
+        }
         printf("}\n");
     }
     if(munmap(shared_data, sizeof(struct shared_data)) == -1) {
