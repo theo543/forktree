@@ -1,0 +1,24 @@
+#!/bin/sh
+# Install this hook using `make hook` or by copying it to .git/hooks/pre-commit.
+
+if ! make -q hook; then
+	make hook
+	exec $0
+fi
+
+set -e
+
+img_sha1() {
+	set -e
+	find "$1" -type f -print0 | sort -z | xargs -0 sha1sum | cut -d' ' -f1 | sha1sum | cut -d' ' -f1
+}
+
+PREV=$(img_sha1 img)
+make IMGDIR=.img.tmp -j$(( $(nproc) + 1 )) >/dev/null 2>&1
+NEXT=$(img_sha1 .img.tmp)
+rm -rf .img.tmp
+
+if [ "$PREV" != "$NEXT" ]; then
+	echo "Error: img/ differs from make output. Please run make and remove any extra files from img/." >&2
+	exit 1
+fi

@@ -10,7 +10,7 @@ SRCS = $(shell find $(SRCDIR) -name '*.c')
 PROGS = $(patsubst $(SRCDIR)/%.c,$(OUTDIR)/%,$(SRCS))
 IMGS = $(patsubst $(SRCDIR)/%.c,$(IMGDIR)/%.$(IMGFMT),$(SRCS))
 
-.PHONY: all clean list progs imgs
+.PHONY: all clean list progs imgs hook
 
 all: progs imgs
 
@@ -33,3 +33,9 @@ clean:
 
 list:
 	@echo $(PROGS)
+
+hook: .git/hooks/pre-commit
+
+.git/hooks/pre-commit: pre-commit
+	cp $< $@
+	chmod +x $@
