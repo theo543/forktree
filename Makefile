@@ -1,30 +1,35 @@
 CC = gcc
 CFLAGS = -I. -Wall -Wextra -pedantic -std=c11 -g -fsanitize=address,undefined
 
-SRCS = $(shell find src -name '*.c')
-PROGS = $(patsubst src/%.c,out/%,$(SRCS))
-PNGS = $(patsubst src/%.c,img/%.png,$(SRCS))
+SRCDIR = src
+OUTDIR = out
+IMGDIR = img
+IMGFMT = png
 
-.PHONY: all clean list progs pngs
+SRCS = $(shell find $(SRCDIR) -name '*.c')
+PROGS = $(patsubst $(SRCDIR)/%.c,$(OUTDIR)/%,$(SRCS))
+IMGS = $(patsubst $(SRCDIR)/%.c,$(IMGDIR)/%.$(IMGFMT),$(SRCS))
 
-all: progs pngs
+.PHONY: all clean list progs imgs
+
+all: progs imgs
 
 progs: $(PROGS)
 
-pngs: $(PNGS)
+imgs: $(IMGS)
 
-out/%: src/%.c frk.h frk.c
+$(OUTDIR)/%: $(SRCDIR)/%.c frk.h frk.c
 	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -o $@ $< frk.c
 
-img/%.png: out/%
+$(IMGDIR)/%.$(IMGFMT): $(OUTDIR)/%
 	mkdir -p $(dir $@)
-	$< | dot -Tpng -o $@
+	$< | dot -T$(IMGFMT) -o $@
 
 clean: 
-	rm -f $(PROGS) $(PNGS)
-	if [ -d out ]; then find out -type d -empty -delete; fi
-	if [ -d img ]; then find img -type d -empty -delete; fi
+	rm -f $(PROGS) $(IMGS)
+	if [ -d $(OUTDIR) ]; then find $(OUTDIR) -type d -empty -delete; fi
+	if [ -d $(IMGDIR) ]; then find $(IMGDIR) -type d -empty -delete; fi
 
 list:
 	@echo $(PROGS)
