@@ -24,9 +24,16 @@ static struct shared_data *shared_data = NULL;
 
 static void close_graph(void) {
     while(wait(NULL) != -1);
-    if(thread_nr > 0) {
-        printf("    %d [xlabel=\"T: %d\"];\n", getpid(), thread_nr);
+    printf("    %d [label=\"", getpid());
+    if(depth == 0) {
+        printf("root");
+    } else {
+        printf("lvl %d", depth);
     }
+    if(thread_nr > 0) {
+        printf("\\nT: %d", thread_nr);
+    }
+    printf("\"];\n");
     if(depth == 0) {
         if(shared_data->total_threads > 0) {
             printf("    label=\"Total threads: %d\\nTotal processes: %d\";\n", shared_data->total_threads, shared_data->total_processes);
@@ -52,7 +59,6 @@ static void initialize(void) {
     shared_data->total_threads = 0;
     shared_data->total_processes = 1;
     printf("digraph process_tree {\n");
-    printf("    %d [label=\"root\"];\n", getpid());
     atexit(close_graph);
     initialized = true;
 }
@@ -63,7 +69,6 @@ pid_t frk(void) {
     pid_t child = fork();
     if(child != 0) {
         printf("    %d -> %d;\n", getpid(), child);
-        printf("    %d [label=\"lvl %d\"];\n", child, depth + 1);
     } else {
         depth++;
         thread_nr = 0;
