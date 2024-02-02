@@ -7,18 +7,19 @@ SRCDIR = src
 OUTDIR = out
 IMGDIR = img
 IMGFMT = png
+DOTVER = $(IMGDIR)/dot_version.txt
 
 SRCS != find $(SRCDIR) -name '*.c'
 PROGS := $(patsubst $(SRCDIR)/%.c,$(OUTDIR)/%,$(SRCS))
 IMGS := $(patsubst $(SRCDIR)/%.c,$(IMGDIR)/%.$(IMGFMT),$(SRCS))
 
-.PHONY: all clean list progs imgs hook
+.PHONY: all clean list progs imgs hook dotver
 
 all: progs imgs
 
 progs: $(PROGS)
 
-imgs: $(IMGS)
+imgs: $(IMGS) $(DOTVER)
 
 $(PROGS): $(OUTDIR)/%: $(SRCDIR)/%.c frk.h frk.c | $$(dir $$@)
 	$(CC) $(CFLAGS) -o $@ $< frk.c
@@ -26,13 +27,18 @@ $(PROGS): $(OUTDIR)/%: $(SRCDIR)/%.c frk.h frk.c | $$(dir $$@)
 $(IMGS): $(IMGDIR)/%.$(IMGFMT): $(OUTDIR)/% | $$(dir $$@)
 	$< | dot -T$(IMGFMT) -o $@
 
-$(sort $(dir $(PROGS)) $(dir $(IMGS))):
+dotver: $(DOTVER)
+
+$(DOTVER): | $(dir $(DOTVER))
+	dot -V > $@ 2>&1
+
+$(sort $(dir $(PROGS)) $(dir $(IMGS)) $(dir $(DOTVER))):
 	mkdir -p $@
 
 clean_dirs = if [ -d $(1) ]; then find $(1) -type d -empty -delete; fi
 
 clean:
-	rm -f $(PROGS) $(IMGS)
+	rm -f $(PROGS) $(IMGS) $(DOTVER)
 	$(call clean_dirs,$(OUTDIR))
 	$(call clean_dirs,$(IMGDIR))
 
