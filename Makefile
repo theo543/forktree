@@ -29,10 +29,12 @@ $(IMGS): $(IMGDIR)/%.$(IMGFMT): $(OUTDIR)/% | $$(dir $$@)
 $(sort $(dir $(PROGS)) $(dir $(IMGS))):
 	mkdir -p $@
 
-clean: 
+clean_dirs = if [ -d $(1) ]; then find $(1) -type d -empty -delete; fi
+
+clean:
 	rm -f $(PROGS) $(IMGS)
-	if [ -d $(OUTDIR) ]; then find $(OUTDIR) -type d -empty -delete; fi
-	if [ -d $(IMGDIR) ]; then find $(IMGDIR) -type d -empty -delete; fi
+	$(call clean_dirs,$(OUTDIR))
+	$(call clean_dirs,$(IMGDIR))
 
 list:
 	@echo $(PROGS)
