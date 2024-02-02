@@ -8,9 +8,9 @@ OUTDIR = out
 IMGDIR = img
 IMGFMT = png
 
-SRCS = $(shell find $(SRCDIR) -name '*.c')
-PROGS = $(patsubst $(SRCDIR)/%.c,$(OUTDIR)/%,$(SRCS))
-IMGS = $(patsubst $(SRCDIR)/%.c,$(IMGDIR)/%.$(IMGFMT),$(SRCS))
+SRCS != find $(SRCDIR) -name '*.c'
+PROGS := $(patsubst $(SRCDIR)/%.c,$(OUTDIR)/%,$(SRCS))
+IMGS := $(patsubst $(SRCDIR)/%.c,$(IMGDIR)/%.$(IMGFMT),$(SRCS))
 
 .PHONY: all clean list progs imgs hook
 
