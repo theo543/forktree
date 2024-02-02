@@ -1,3 +1,5 @@
+.SECONDEXPANSION:
+
 CC = gcc
 CFLAGS = -I. -Wall -Wextra -pedantic -std=c11 -g -fsanitize=address,undefined
 
@@ -18,13 +20,14 @@ progs: $(PROGS)
 
 imgs: $(IMGS)
 
-$(OUTDIR)/%: $(SRCDIR)/%.c frk.h frk.c
-	mkdir -p $(dir $@)
+$(PROGS): $(OUTDIR)/%: $(SRCDIR)/%.c frk.h frk.c | $$(dir $$@)
 	$(CC) $(CFLAGS) -o $@ $< frk.c
 
-$(IMGDIR)/%.$(IMGFMT): $(OUTDIR)/%
-	mkdir -p $(dir $@)
+$(IMGS): $(IMGDIR)/%.$(IMGFMT): $(OUTDIR)/% | $$(dir $$@)
 	$< | dot -T$(IMGFMT) -o $@
+
+$(sort $(dir $(PROGS)) $(dir $(IMGS))):
+	mkdir -p $@
 
 clean: 
 	rm -f $(PROGS) $(IMGS)
