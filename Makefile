@@ -36,8 +36,13 @@ clean:
 	$(call clean_dirs,$(OUTDIR))
 	$(call clean_dirs,$(IMGDIR))
 
+print_var = $(info $(1) = $(sort $($(1))))
+
 list:
-	@echo $(PROGS)
+	$(call print_var,SRCS)
+	$(call print_var,PROGS)
+	$(call print_var,IMGS)
+	@:
 
 hook: .git/hooks/pre-commit
 
