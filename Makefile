@@ -8,6 +8,7 @@ OUTDIR = out
 IMGDIR = img
 IMGFMT = png
 DOTVER = $(IMGDIR)/dot_version.txt
+DOTCMD = dot
 
 SRCS != find $(SRCDIR) -name '*.c'
 PROGS := $(patsubst $(SRCDIR)/%.c,$(OUTDIR)/%,$(SRCS))
@@ -25,12 +26,12 @@ $(PROGS): $(OUTDIR)/%: $(SRCDIR)/%.c frk.h frk.c | $$(dir $$@)
 	$(CC) $(CFLAGS) -o $@ $< frk.c
 
 $(IMGS): $(IMGDIR)/%.$(IMGFMT): $(OUTDIR)/% | $$(dir $$@)
-	$< | dot -T$(IMGFMT) -o $@
+	$< | $(DOTCMD) -T$(IMGFMT) -o $@
 
 dotver: $(DOTVER)
 
 $(DOTVER): | $(dir $(DOTVER))
-	dot -V > $@ 2>&1
+	$(DOTCMD) -V > $@ 2>&1
 
 $(sort $(dir $(PROGS)) $(dir $(IMGS)) $(dir $(DOTVER))):
 	mkdir -p $@
