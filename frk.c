@@ -3,6 +3,7 @@
 #include <stdatomic.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdio.h>
 
 #include <sys/types.h>
@@ -24,16 +25,15 @@ static struct shared_data *shared_data = NULL;
 
 static void close_graph(void) {
     while(wait(NULL) != -1);
-    printf("    %d [label=\"", getpid());
-    if(depth == 0) {
-        printf("root");
-    } else {
-        printf("lvl %d", depth);
+    char label_buf[128] = "root";
+    int label_len = 4;
+    if(depth > 0) {
+        label_len = sprintf(label_buf, "lvl %d", depth);
     }
     if(thread_nr > 0) {
-        printf("\\nT: %d", thread_nr);
+        sprintf(label_buf + label_len, "\\nT: %d", thread_nr);
     }
-    printf("\"];\n");
+    printf("    %d [label=\"%s\"];\n", getpid(), label_buf);
     if(depth == 0) {
         if(shared_data->total_threads > 0) {
             printf("    label=\"Total threads: %d\\nTotal processes: %d\";\n", shared_data->total_threads, shared_data->total_processes);
